@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Для Веры 💖</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'Georgia', serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #ffd6e8 0%, #ffe4f0 50%, #ffc8dd 100%);
+    overflow-x: hidden;
+    padding: 20px;
+    position: relative;
+  }
+
+  /* Плавающие украшения на фоне */
+  .floaty {
+    position: fixed;
+    pointer-events: none;
+    opacity: 0.5;
+    animation: floatUp linear infinite;
+    z-index: 0;
+    user-select: none;
+  }
+  @keyframes floatUp {
+    0%   { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.6; }
+    90%  { opacity: 0.6; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* Книжка */
+  .book {
+    width: 100%;
+    max-width: 520px;
+    min-height: 640px;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(214, 51, 132, 0.35),
+                0 0 0 10px rgba(255, 255, 255, 0.5),
+                0 0 0 14px rgba(255, 182, 213, 0.6);
+    padding: 40px 30px;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: background 0.8s ease;
+    background: #ffe4f0;
+    overflow: hidden;
+  }
+
+  /* Узор поверх страницы */
+  .book::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(255,255,255,0.7) 2px, transparent 2px),
+      radial-gradient(circle at 80% 30%, rgba(255,255,255,0.6) 3px, transparent 3px),
+      radial-gradient(circle at 40% 80%, rgba(255,255,255,0.5) 2px, transparent 2px),
+      radial-gradient(circle at 90% 85%, rgba(255,255,255,0.6) 2px, transparent 2px),
+      radial-gradient(circle at 60% 50%, rgba(255,255,255,0.4) 1px, transparent 1px);
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .book > * { position: relative; z-index: 1; }
+
+  /* Фото в кружочке */
+  .photo-circle {
+    width: 170px;
+    height: 170px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid #fff;
+    box-shadow: 0 10px 30px rgba(214, 51, 132, 0.4),
+                0 0 0 4px rgba(255, 182, 213, 0.8);
+    margin-bottom: 22px;
+    display: block;
+    animation: photoPulse 3s ease-in-out infinite;
+  }
+  @keyframes photoPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+  }
+
+  .page-title {
+    font-size: 1.6rem;
+    color: #b0306b;
+    margin-bottom: 18px;
+    font-weight: 700;
+    text-shadow: 0 1px 0 #fff;
+  }
+
+  .page-text {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    color: #7a294f;
+    margin-bottom: 14px;
+  }
+
+  .emoji-big {
+    font-size: 3rem;
+    margin: 10px 0 18px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+
+  /* Кнопки */
+  .btn {
+    border: none;
+    cursor: pointer;
+    padding: 14px 28px;
+    border-radius: 30px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(135deg, #ff7eb3, #ff4f9a);
+    box-shadow: 0 8px 20px rgba(255, 79, 154, 0.4);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    margin: 8px;
+    min-width: 130px;
+  }
+  .btn:hover { transform: translateY(-3px); box-shadow: 0 12px 26px rgba(255, 79, 154, 0.55); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .btn-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-top: 10px; }
+
+  .question {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #a02860;
+    margin-bottom: 26px;
+    line-height: 1.5;
+    text-shadow: 0 1px 0 #fff;
+  }
+
+  .feedback { font-size: 1.1rem; margin-top: 16px; min-height: 28px; font-weight: 600; }
+  .ok { color: #1e9e5a; }
+  .bad { color: #d63384; }
+
+  .attempts { font-size: 0.95rem; color: #a85578; margin-top: 14px; }
+
+  .progress {
+    position: absolute;
+    top: 16px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #b0306b;
+    opacity: 0.75;
+    letter-spacing: 1px;
+  }
+
+  /* Таймер */
+  .timer {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #d63384;
+    margin: 18px 0;
+    letter-spacing: 2px;
+  }
+
+  /* Модальное окно подтверждения */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(120, 40, 80, 0.45);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+  }
+  .modal {
+    background: linear-gradient(160deg, #fff0f7 0%, #ffe4f0 100%);
+    padding: 32px 26px;
+    border-radius: 22px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(214, 51, 132, 0.5),
+                0 0 0 6px rgba(255, 255, 255, 0.6);
+    animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes popIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+  .modal-emoji { font-size: 2.6rem; margin-bottom: 12px; }
+  .modal-text {
+    font-size: 1.2rem;
+    color: #a02860;
+    font-weight: 700;
+    margin-bottom: 22px;
+    line-height: 1.5;
+  }
+  .modal-btns { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+  .btn-yes {
+    background: linear-gradient(135deg, #ff7eb3, #ff4f9a);
+  }
+  .btn-no {
+    background: linear-gradient(135deg, #c9a0dc, #a875c9);
+  }
+
+  /* Награда */
+  .reward-word {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #b0306b;
+    background: #fff0f7;
+    padding: 16px 22px;
+    border-radius: 16px;
+    border: 2px dashed #ff7eb3;
+    margin: 18px 0;
+    cursor: pointer;
+    user-select: all;
+    word-break: break-word;
+    line-height: 1.4;
+  }
+  .copied { font-size: 0.95rem; color: #1e9e5a; min-height: 22px; margin-top: 10px; font-weight: 600; }
+
+  .small { font-size: 0.85rem; color: #a85578; margin-top: 14px; opacity: 0.85; line-height: 1.5; }
+
+  /* Искры */
+  .spark {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    box-shadow: 0 0 8px currentColor;
+  }
+  @keyframes sparkFly {
+    0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+  }
+
+  .fade-in { animation: fadeIn 0.5s ease; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="book" id="book">
+  <div class="progress" id="progress"></div>
+  <div id="content"></div>
+</div>
+
+<script>
+/* ==========================================================
+   НАСТРОЙКИ
+   ========================================================== */
+const MAX_ATTEMPTS = 3;        // попыток на все вопросы
+const COOLDOWN_SEC = 180;      // 3 минуты
+
+/* ----------------------------------------------------------
+   3 СТРАНИЦЫ-КОМПЛИМЕНТА
+   Первые две — с фото, третья — просто тёплая
+   ---------------------------------------------------------- */
+const complimentPages = [
+  {
+    bg: "linear-gradient(160deg, #ffe4f0 0%, #ffd1e6 100%)",
+    photo: "https://i.ibb.co/ZzkjrDHF/IMG-20260929-163559-724.jpg",
+    title: "Привет, Вера!",
+    text: "Эта маленькая книжка сделана специально для тебя — Славой. 💌<br><br>Листай дальше, тут только тёплые слова и немного сюрпризов."
+  },
+  {
+    bg: "linear-gradient(160deg, #fff0d6 0%, #ffe0a8 100%)",  // жёлтый
+    photo: "https://i.ibb.co/PZ4q2xg7/IMG-20260929-163557-601.jpg",
+    title: "Страница вторая",
+    text: "Ты очень добрая и светлая. С тобой рядом становится теплее, даже если просто переписываться."
+  },
+  {
+    bg: "linear-gradient(160deg, #e4f0ff 0%, #c9d9ff 100%)",  // голубой
+    photo: null,
+    title: "Страница третья",
+    text: "У тебя красивая улыбка и доброе сердце. Не забывай об этом никогда, ладно? ✨"
+  }
+];
+
+/* ----------------------------------------------------------
+   10 ВОПРОСОВ
+   correct = индекс правильного ответа (0 = Да, 1 = Нет)
+   ---------------------------------------------------------- */
+const questions = [
+  { q: "Ты очень красивая, это правда?", a: ["Да", "Нет"], correct: 0 },
+  { q: "У тебя самая милая улыбка на свете?", a: ["Да", "Нет"], correct: 0 },
+  { q: "Ты умная и сообразительная?", a: ["Да", "Нет"], correct: 0 },
+  { q: "С тобой интересно разговаривать?", a: ["Да", "Нет"], correct: 0 },
+  { q: "Ты заслуживаешь только хорошего?", a: ["Да", "Нет"], correct: 0 },
+  { q: "Ты умеешь делать мир вокруг добрее?", a: ["Да", "Нет"], correct: 0 },
+  { q: "Ты классная, даже когда грустишь?", a: ["Да", "Нет"], correct: 0 },
+  { q: "Ты — настоящая, и это здорово?", a: ["Да", "Нет"], correct: 0 },
+  { q: "Тебе можно доверять секретики?", a: ["Да", "Нет"], correct: 0 },
+  { q: "Ты просто чудо, согласна?", a: ["Да", "Нет"], correct: 0 }
+];
+
+/* Слово-награда */
+const REWARD_WORD = "ВЕРА — САМОЕ ЛУЧШЕЕ ЧУДО 💖";
+
+/* Фоны для вопросов — разные цвета */
+const questionBgs = [
+  "linear-gradient(160deg, #ffe4f0 0%, #ffd1e6 100%)", // розовый
+  "linear-gradient(160deg, #fff0d6 0%, #ffe0a8 100%)", // жёлтый
+  "linear-gradient(160deg, #d6ffe0 0%, #a8f0c0 100%)", // зелёный
+  "linear-gradient(160deg, #e4f0ff 0%, #c9d9ff 100%)", // голубой
+  "linear-gradient(160deg, #ffe0e0 0%, #ffb8b8 100%)", // красный
+  "linear-gradient(160deg, #fbe4ff 0%, #e8c4ff 100%)", // сиреневый
+  "linear-gradient(160deg, #ffe0f0 0%, #ffb8d9 100%)", // малиновый
+  "linear-gradient(160deg, #e0ffe8 0%, #b8f0c9 100%)", // мятный
+  "linear-gradient(160deg, #fff4e0 0%, #ffe0b8 100%)", // персиковый
+  "linear-gradient(160deg, #ffe4f0 0%, #ffc2dd 100%)"  // нежно-розовый
+];
+
+/* ==========================================================
+   ЛОГИКА
+   ========================================================== */
+const book = document.getElementById("book");
+const content = document.getElementById("content");
+const progressEl = document.getElementById("progress");
+
+let currentCompliment = 0;
+let currentQuestion = 0;
+let attemptsLeft = MAX_ATTEMPTS;
+let lockedUntil = 0;
+let timerInterval = null;
+
+/* ---- Плавающие украшения ---- */
+function spawnFloaty() {
+  const symbols = ["💖", "🌸", "✨", "💕", "🩷", "⭐", "🌷", "💗", "🎀", "🍓"];
+  for (let i = 0; i < 22; i++) {
+    const el = document.createElement("div");
+    el.className = "floaty";
+    el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    el.style.left = Math.random() * 100 + "vw";
+    el.style.fontSize = (12 + Math.random() * 20) + "px";
+    el.style.animationDuration = (10 + Math.random() * 14) + "s";
+    el.style.animationDelay = (Math.random() * 12) + "s";
+    document.body.appendChild(el);
+  }
+}
+
+/* ---- ИСКРЫ при клике ---- */
+function spawnSparks(x, y) {
+  const colors = ["#ff7eb3", "#ff4f9a", "#ffb8d9", "#ffd1e6", "#ff9ec7", "#ffc2dd"];
+  const count = 18;
+  for (let i = 0; i < count; i++) {
+    const spark = document.createElement("div");
+    spark.className = "spark";
+    const size = 6 + Math.random() * 8;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    spark.style.width = size + "px";
+    spark.style.height = size + "px";
+    spark.style.background = color;
+    spark.style.color = color;
+    spark.style.left = x + "px";
+    spark.style.top = y + "px";
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 60 + Math.random() * 100;
+    spark.style.setProperty("--dx", Math.cos(angle) * dist + "px");
+    spark.style.setProperty("--dy", Math.sin(angle) * dist + "px");
+    spark.style.animation = `sparkFly ${0.6 + Math.random() * 0.5}s ease-out forwards`;
+    document.body.appendChild(spark);
+    setTimeout(() => spark.remove(), 1200);
+  }
+}
+
+/* Привязка искр ко всем кнопкам */
+function attachSparks(btn) {
+  if (!btn) return;
+  btn.addEventListener("click", (e) => {
+    const rect = btn.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    spawnSparks(x, y);
+  });
+}
+
+/* ---- Модальное окно подтверждения ---- */
+function showConfirm(onYes) {
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `
+    <div class="modal">
+      <div class="modal-emoji">💌</div>
+      <div class="modal-text">Точно хочешь посмотреть, что дальше?</div>
+      <div class="modal-btns">
+        <button class="btn btn-yes" id="confirmYes">Да 💕</button>
+        <button class="btn btn-no" id="confirmNo">Нет</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const yesBtn = overlay.querySelector("#confirmYes");
+  const noBtn = overlay.querySelector("#confirmNo");
+
+  attachSparks(yesBtn);
+  attachSparks(noBtn);
+
+  yesBtn.onclick = () => {
+    overlay.remove();
+    onYes();
+  };
+  noBtn.onclick = () => overlay.remove();
+}
+
+/* ---- Показать страницу-комплимент ---- */
+function showCompliment(index) {
+  clearInterval(timerInterval);
+  const page = complimentPages[index];
+  book.style.background = page.bg;
+  progressEl.textContent = `Страница ${index + 1} из ${complimentPages.length + questions.length + 1}`;
+
+  const photoHTML = page.photo
+    ? `<img class="photo-circle" src="${page.photo}" alt="Вера">`
+    : `<div class="emoji-big">✨</div>`;
+
+  content.innerHTML = `
+    <div class="fade-in">
+      ${photoHTML}
+      <h1 class="page-title">${page.title}</h1>
+      <p class="page-text">${page.text}</p>
+      <button class="btn" id="nextBtn">Дальше →</button>
+    </div>
+  `;
+
+  const nextBtn = document.getElementById("nextBtn");
+  attachSparks(nextBtn);
+
+  nextBtn.onclick = () => {
+    // Предупреждение перед переходом
+    showConfirm(() => {
+      currentCompliment++;
+      if (currentCompliment < complimentPages.length) {
+        showCompliment(currentCompliment);
+      } else {
+        currentQuestion = 0;
+        attemptsLeft = MAX_ATTEMPTS;
+        lockedUntil = 0;
+        showQuestion();
+      }
+    });
+  };
+}
+
+/* ---- Показать вопрос ---- */
+function showQuestion() {
+  clearInterval(timerInterval);
+
+  if (lockedUntil > Date.now()) {
+    showCooldown();
+    return;
+  }
+
+  if (currentQuestion >= questions.length) {
+    showReward();
+    return;
+  }
+
+  book.style.background = questionBgs[currentQuestion % questionBgs.length];
+
+  const q = questions[currentQuestion];
+  progressEl.textContent = `Вопрос ${currentQuestion + 1} из ${questions.length}`;
+
+  content.innerHTML = `
+    <div class="fade-in">
+      <p class="question">${q.q}</p>
+      <div class="btn-row">
+        <button class="btn" id="yesBtn">${q.a[0]}</button>
+        <button class="btn" id="noBtn">${q.a[1]}</button>
+      </div>
+      <p class="feedback" id="feedback"></p>
+      <p class="attempts" id="attempts">Попыток осталось: ${attemptsLeft}</p>
+    </div>
+  `;
+
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn = document.getElementById("noBtn");
+  attachSparks(yesBtn);
+  attachSparks(noBtn);
+
+  yesBtn.onclick = () => answerQuestion(0);
+  noBtn.onclick = () => answerQuestion(1);
+}
+
+/* ---- Обработка ответа ---- */
+function answerQuestion(chosen) {
+  const q = questions[currentQuestion];
+  const feedback = document.getElementById("feedback");
+  const attemptsEl = document.getElementById("attempts");
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn = document.getElementById("noBtn");
+
+  if (chosen === q.correct) {
+    feedback.textContent = "Правильно! 💗 Молодец!";
+    feedback.className = "feedback ok";
+    yesBtn.disabled = true;
+    noBtn.disabled = true;
+
+    setTimeout(() => {
+      currentQuestion++;
+      if (currentQuestion >= questions.length) {
+        showReward();
+      } else {
+        showQuestion();
+      }
+    }, 900);
+  } else {
+    attemptsLeft--;
+    if (attemptsLeft > 0) {
+      feedback.textContent = `Ой, не то! Осталось попыток: ${attemptsLeft}`;
+      feedback.className = "feedback bad";
+      attemptsEl.textContent = `Попыток осталось: ${attemptsLeft}`;
+    } else {
+      feedback.textContent = "Попытки закончились 😢";
+      feedback.className = "feedback bad";
+      yesBtn.disabled = true;
+      noBtn.disabled = true;
+      lockedUntil = Date.now() + COOLDOWN_SEC * 1000;
+      setTimeout(showCooldown, 1200);
+    }
+  }
+}
+
+/* ---- Экран блокировки ---- */
+function showCooldown() {
+  clearInterval(timerInterval);
+  book.style.background = "linear-gradient(160deg, #ffe4f0 0%, #ffb8d9 100%)";
+  progressEl.textContent = "Немного подождём...";
+
+  function render() {
+    const left = Math.max(0, Math.ceil((lockedUntil - Date.now()) / 1000));
+    const m = String(Math.floor(left / 60)).padStart(2, "0");
+    const s = String(left % 60).padStart(2, "0");
+
+    content.innerHTML = `
+      <div class="fade-in">
+        <div class="emoji-big">⏳</div>
+        <h1 class="page-title">Немного отдохнём</h1>
+        <p class="page-text">Ты использовала все попытки. Начнём заново совсем скоро!</p>
+        <div class="timer">${m}:${s}</div>
+        <p class="small">Не закрывай страничку 💕</p>
+      </div>
+    `;
+
+    if (left <= 0) {
+      clearInterval(timerInterval);
+      currentQuestion = 0;
+      attemptsLeft = MAX_ATTEMPTS;
+      lockedUntil = 0;
+      showQuestion();
+    }
+  }
+
+  render();
+  timerInterval = setInterval(render, 1000);
+}
+
+/* ---- Финальный экран ---- */
+function showReward() {
+  clearInterval(timerInterval);
+  book.style.background = "linear-gradient(160deg, #ffd6e8 0%, #ff9ec7 100%)";
+  progressEl.textContent = "🎉 Финал 🎉";
+
+  content.innerHTML = `
+    <div class="fade-in">
+      <div class="emoji-big">🏆💖</div>
+      <h1 class="page-title">Поздравляю, Вера!</h1>
+      <p class="page-text">Ты прошла все вопросы! Вот твоя награда:</p>
+      <div class="reward-word" id="rewardWord">${REWARD_WORD}</div>
+      <button class="btn" id="claimBtn">Забрать 🎁</button>
+      <p class="copied" id="copiedMsg"></p>
+      <p class="small">Сделано с любовью для тебя 💌<br>— Слава</p>
+    </div>
+  `;
+
+  const claimBtn = document.getElementById("claimBtn");
+  attachSparks(claimBtn);
+
+  claimBtn.onclick = () => {
+    const text = REWARD_WORD;
+    const msg = document.getElementById("copiedMsg");
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        msg.textContent = "Награда скопирована! 💗";
+      }).catch(() => fallbackCopy(text, msg));
+    } else {
+      fallbackCopy(text, msg);
+    }
+
+    const wordEl = document.getElementById("rewardWord");
+    const range = document.createRange();
+    range.selectNodeContents(wordEl);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  };
+}
+
+function fallbackCopy(text, msgEl) {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand("copy");
+    msgEl.textContent = "Награда скопирована! 💗";
+  } catch (e) {
+    msgEl.textContent = "Выдели слово и скопируй вручную 💕";
+  }
+  document.body.removeChild(ta);
+}
+
+/* ---- Старт ---- */
+spawnFloaty();
+showCompliment(0);
+</script>
+</body>
+  </html>
